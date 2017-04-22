@@ -1,0 +1,10 @@
+1. Domain understanding and goal setting
+2. Creating a target data set 
+3. Data cleaning and preprocessing
+4. Data reduction and projection
+5. Data mining
+ i. Choosing the data mining task
+ ii. Choosing the data mining algorithm(s)
+ iii. Use of data mining algorithms
+6. Interpretation of mined patterns
+7. Utilization of discovered knowledge
