@@ -4,7 +4,7 @@
 install.packages("jsonlite")
 library(jsonlite)
 
-setwd("~/Desktop/toss-up/scripts")
+setwd("~/Desktop/kdd-cricket")
 raw.data <- read.csv("final_output.csv")
 
 # Find the missing odi matches

@@ -39,5 +39,5 @@ for match_type in ['odi']:
             print str.split(new_host, "/")[4].split('.')[0]
             results.append(str.split(new_host, "/")[4].split('.')[0])
 
-    with open("1-data-sources/matches-{0}.json".format(match_type), "wb") as f:
+    with open("1-data-sources/{0}.json".format(match_type), "wb") as f:
         simplejson.dump(results, f)
