@@ -10,7 +10,7 @@ matches = simplejson.loads(open('1-data-sources/odi.json').read())
 matches = list(set(matches)) # dedupe
 
 ##################################START PROCESSING DATA#########################################
-with open("2-target-data/cricinfo-odi-data.csv", "wb") as csvfile:
+with open("2-target-data/cricinfo_odi_data.csv", "wb") as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(headers)
     for match in matches:

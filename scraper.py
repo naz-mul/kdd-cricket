@@ -24,7 +24,7 @@ for match_type in ['odi']:
     r = requests.get('http://search.espncricinfo.com/ci/content/match/search.html?all=1;page=0;search=' + match_type)
     soup = BeautifulSoup(r.text)
     # last_match = int(soup.findAll('span', attrs={'class':'PaginationNmbrs'})[-1].text)
-    last_page = 326
+    last_page = 2
     for i in range(0, last_page):
         time.sleep(1)
         results_page = requests.get("http://search.espncricinfo.com/ci/content/match/search.html?search={0};all=1;page={1}".format(match_type, i))
@@ -39,5 +39,5 @@ for match_type in ['odi']:
             print str.split(new_host, "/")[4].split('.')[0]
             results.append(str.split(new_host, "/")[4].split('.')[0])
 
-    with open("matches-{0}.json".format(match_type), "wb") as f:
+    with open("1-data-sources/matches-{0}.json".format(match_type), "wb") as f:
         simplejson.dump(results, f)
