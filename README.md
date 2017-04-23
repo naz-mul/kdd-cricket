@@ -1,4 +1,14 @@
-# Determining the probabilities of winning a men's ODI cricket match
+# Knowledge Discovery in Databases: Cricket
+In cricket, there is a wealth of statistical data, such as batting records, bowling records, individual player records, match scorecard etc. To put this data to proper use, it can be accrued and analysed to make accurate predictions for a game that is known to be unpredictable. In this study, I assessed the numerous aspects affecting the outcome of men’s one day international cricket matches by classifying the key elements from the data set and using several data-mining techniques. I mainly concentrated on the importance of home advantage and the magnitude of the toss decision whether to bat or bowl first. Although, winning the toss is a significant characteristic of a cricket match, I discovered, other aspects incline to overshadow the outcome of the match result, specifically when factoring the merit of the team and the situation of the tournament.
+
+## Steps
+Step 1: Selection (data into target data)
+Step 2: Preprocessing (target data into processed data)
+Step 3: Transformation (processed data into transformed data)
+Step 4: Data Mining (transformed data into patterns)
+Step 5: Interpretation and/or Evaluation patterns into knowledge)
+
+## Definitions
 1. Data Integration: First of all the data are collected and integrated from all the different sources.
 
 2. Data Selection: We may not all the data we have collected in the first step. In this step we select only those data which we think useful for data mining.
