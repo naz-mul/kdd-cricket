@@ -26,6 +26,8 @@ dim(raw.data[duplicated(raw.data$id),])[1]
 
 # Explore raw dataset
 summary(raw.data)
+str(raw.data)
+
 
 ##### Task 2 - pre-processing countries #####
 # Explore teams
@@ -82,7 +84,8 @@ levels(raw.data.sub$team_b)
 summary(raw.data.sub$outcome) # 135 no result, 92 abandoned, 33 tied
 raw.data.sub <- raw.data.sub[raw.data.sub$outcome != "No result", ]
 raw.data.sub <- raw.data.sub[raw.data.sub$outcome != "Match abandoned without a ball bowled", ]
-
+raw.data.sub <- raw.data.sub[raw.data.sub$outcom != "No result (abandoned with a toss)", ]
+  
 # set TIE to winner variable for all the tied matches
 raw.data.sub$winner <- as.character(raw.data.sub$winner)
 raw.data.sub$winner[raw.data.sub$outcome == "Match tied"] <- as.character("TIE")
@@ -91,19 +94,17 @@ sum(raw.data.sub$winner == "") # 5 empty winners values
 sum(raw.data.sub$toss_winner == "") # 7 empty toss winner values
 summary(raw.data.sub$winner)
 
-# first innings total
-raw.data.sub <- droplevels(raw.data.sub)
+# remove walkover/forfeited matches
+raw.data.sub$winner <- droplevels(raw.data.sub$winner)
 summary(raw.data.sub)
-raw.data.sub[raw.data.sub$first_innings_total == 0, 1] # 66310, 251493 and 3 NA
-raw.data.sub[raw.data.sub$id == c(66310, 251493), ]
+str(raw.data.sub)
 raw.data.sub[is.na(raw.data.sub$first_innings_total), 1]
+raw.data.sub <- raw.data.sub[!is.na(raw.data.sub$first_innings_total), ]
+summary(raw.data.sub)
 
 
 
-
-
-
-
+levels(raw.data.sub$toss_winner)
 
 
 
