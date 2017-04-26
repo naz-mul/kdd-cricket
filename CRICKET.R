@@ -38,12 +38,36 @@ setdiff(raw.data$team_a, raw.data$team_b) # 11 teams
 setdiff(raw.data$team_b, raw.data$team_a) # 16 teams
 
 library(dplyr)
-full_members <- c("Australia", "Australia Women","Bangladesh", "Bangladesh Women", "England", "England Women", "India", "India Women", "New Zealand", "New Zealand Women", "Pakistan", "Pakistan Women", "South Africa", "South Africa Women","Sri Lanka", "Sri Lanka Women","West Indies", "West Indies Women","Zimbabwe", "Zimbabwe Women")
-raw.data.sub <- filter(raw.data, team_a %in% full_members & team_b %in% full_members)
+full_members <-
+  c(
+    "Australia",
+    "Australia Women",
+    "Bangladesh",
+    "Bangladesh Women",
+    "England",
+    "England Women",
+    "India",
+    "India Women",
+    "New Zealand",
+    "New Zealand Women",
+    "Pakistan",
+    "Pakistan Women",
+    "South Africa",
+    "South Africa Women",
+    "Sri Lanka",
+    "Sri Lanka Women",
+    "West Indies",
+    "West Indies Women",
+    "Zimbabwe",
+    "Zimbabwe Women"
+  )
+raw.data.sub <-
+  filter(raw.data, team_a %in% full_members &
+           team_b %in% full_members)
 raw.data.sub <- droplevels(raw.data.sub) # 4231 observations
 levels(raw.data.sub$team_a)
 levels(raw.data.sub$team_b)
-(nrow(raw.data.sub)/nrow(raw.data)*100) # 65.12% full ICC teams
+(nrow(raw.data.sub) / nrow(raw.data) * 100) # 65.12% full ICC teams
 
 # Create a new column for gender
 raw.data.sub$gender <- NA
@@ -70,8 +94,8 @@ prop.table(table(raw.data.sub$gender)) # 19 vs 81
 
 
 # truncate 'women' from tream names
-raw.data.sub$team_a<- sub(" Women", "", raw.data.sub$team_a)
-raw.data.sub$team_b<- sub(" Women", "", raw.data.sub$team_b)
+raw.data.sub$team_a <- sub(" Women", "", raw.data.sub$team_a)
+raw.data.sub$team_b <- sub(" Women", "", raw.data.sub$team_b)
 raw.data.sub$team_a <- as.factor(raw.data.sub$team_a)
 raw.data.sub$team_b <- as.factor(raw.data.sub$team_b)
 raw.data.sub <- droplevels(raw.data.sub)
@@ -84,8 +108,10 @@ levels(raw.data.sub$team_b)
 # removing no result, tied and abandoned matches
 summary(raw.data.sub$outcome) # 135 no result, 92 abandoned, 33 tied
 raw.data.sub <- raw.data.sub[raw.data.sub$outcome != "No result", ]
-raw.data.sub <- raw.data.sub[raw.data.sub$outcome != "Match abandoned without a ball bowled", ]
-raw.data.sub <- raw.data.sub[raw.data.sub$outcome != "No result (abandoned with a toss)", ]
+raw.data.sub <-
+  raw.data.sub[raw.data.sub$outcome != "Match abandoned without a ball bowled", ]
+raw.data.sub <-
+  raw.data.sub[raw.data.sub$outcome != "No result (abandoned with a toss)", ]
 raw.data.sub <- raw.data.sub[raw.data.sub$outcome != "Match tied", ]
 
 
@@ -94,7 +120,8 @@ raw.data.sub$winner <- droplevels(raw.data.sub$winner)
 summary(raw.data.sub)
 str(raw.data.sub)
 raw.data.sub[is.na(raw.data.sub$first_innings_total), 1] # 3 walkver matches
-raw.data.sub <- raw.data.sub[!is.na(raw.data.sub$first_innings_total), ]
+raw.data.sub <-
+  raw.data.sub[!is.na(raw.data.sub$first_innings_total), ]
 summary(raw.data.sub)
 
 
@@ -103,7 +130,8 @@ summary(raw.data.sub)
 str(raw.data.sub)
 raw.data.sub$day_night <- as.factor(raw.data.sub$day_night)
 raw.data.sub$rain <- as.factor(raw.data.sub$rain)
-raw.data.sub$duckworth_lewis <- as.factor(raw.data.sub$duckworth_lewis)
+raw.data.sub$duckworth_lewis <-
+  as.factor(raw.data.sub$duckworth_lewis)
 
 
 levels(raw.data.sub$team_a) # 10 unique teams
@@ -150,27 +178,41 @@ raw.data.sub <- raw.data.sub[raw.data.sub$winner != "", ]
 
 # find missing toss decisions
 summary(raw.data.sub$toss_decision) # 2576 missing values
-raw.data.sub$toss_decision[raw.data.sub$toss_decision == ""] <- NA # set empty strings to NA
+raw.data.sub$toss_decision[raw.data.sub$toss_decision == ""] <-
+  NA # set empty strings to NA
 raw.data.sub <- droplevels(raw.data.sub)
 summary(raw.data.sub$toss_decision)
 
 ## find toss decision values within a date range
 library(dplyr)
-na.toss.decision <- filter(raw.data.sub, is.na(toss_decision)) # 820 matches
-prop.table(table(is.na(raw.data.sub$toss_decision), !is.na(raw.data.sub$toss_decision))) # 21%
-nrow(na.toss.decision)/nrow(raw.data.sub)*100 # 20.71%
+na.toss.decision <-
+  filter(raw.data.sub, is.na(toss_decision)) # 820 matches
+prop.table(table(
+  is.na(raw.data.sub$toss_decision),!is.na(raw.data.sub$toss_decision)
+)) # 21%
+nrow(na.toss.decision) / nrow(raw.data.sub) * 100 # 20.71%
 
 ## find number of matches with missing toss decision per year
-total.toss <- aggregate(cbind(id)~year(date),
-          data=na.toss.decision,FUN=length)
+total.toss <- aggregate(cbind(id) ~ year(date),
+                        data = na.toss.decision, FUN = length)
 
-bp <- barplot(total.toss$id, horiz = FALSE, 
-        names.arg = total.toss$`year(date)`,
-        ylim = c(0, 120),
-        main = "Number of empty toss decisions by year",
-        xlab = "Year",
-        ylab = "No of missing toss decisions")
-text(x = bp, y = total.toss$id, label = total.toss$id, pos = 4, cex = 0.8, col = "red")
+bp <- barplot(
+  total.toss$id,
+  horiz = FALSE,
+  names.arg = total.toss$`year(date)`,
+  ylim = c(0, 120),
+  main = "Number of empty toss decisions by year",
+  xlab = "Year",
+  ylab = "No of missing toss decisions"
+)
+text(
+  x = bp,
+  y = total.toss$id,
+  label = total.toss$id,
+  pos = 4,
+  cex = 0.8,
+  col = "red"
+)
 
 
 ## remove missing toss decision observations
@@ -183,14 +225,15 @@ summary(raw.data.sub)
 # Set D/L method values
 # duckworth lewis matches have error values
 # does not have 1 assigned to matches played in D/L method
-table(raw.data.sub$duckworth_lewis, grepl('D/L method', raw.data.sub$outcome)) # 96 matches
+table(raw.data.sub$duckworth_lewis,
+      grepl('D/L method', raw.data.sub$outcome)) # 96 matches
 
 raw.data.sub$duckworth_lewis <-
   mapply(grepl,
          pattern = "D/L method",
          x = raw.data.sub$outcome)
 
-set.duckworth.lewis= function(dlcol) {
+set.duckworth.lewis = function(dlcol) {
   for (i in 1:length(dlcol)) {
     if (dlcol[i] == TRUE)
       dlcol[i] <- 1
@@ -200,8 +243,10 @@ set.duckworth.lewis= function(dlcol) {
   dlcol
 }
 
-raw.data.sub$duckworth_lewis <- set.duckworth.lewis(raw.data.sub$duckworth_lewis)
-raw.data.sub$duckworth_lewis <- as.factor(raw.data.sub$duckworth_lewis)
+raw.data.sub$duckworth_lewis <-
+  set.duckworth.lewis(raw.data.sub$duckworth_lewis)
+raw.data.sub$duckworth_lewis <-
+  as.factor(raw.data.sub$duckworth_lewis)
 summary(raw.data.sub$duckworth_lewis) # 0: 3043, 1: 96
 prop.table(table(raw.data.sub$duckworth_lewis))
 
@@ -211,32 +256,58 @@ prop.table(table(raw.data.sub$duckworth_lewis))
 ##### Step 4 - altering values #####
 # rename toss winner and winner abbreviations to country names
 levels(raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("AUS", "Australia", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("AUSWN", "Australia", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("AustraliaWN", "Australia", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("BD-W", "Bangladesh", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("BDESH", "Bangladesh", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("ENG", "England", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("ENGWN", "England", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("EnglandWN", "England", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("IND-W", "India", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("INDIA", "India", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("NZ", "New Zealand", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("NZWN", "New Zealand", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("New ZealandWN", "New Zealand", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("PAK", "Pakistan", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("PAK-W", "Pakistan", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("Pakistan-W", "Pakistan", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("SA", "South Africa", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("SA-W", "South Africa", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("South Africa-W", "South Africa", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("SL", "Sri Lanka", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("SL-W", "Sri Lanka", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("Sri Lanka-W", "Sri Lanka", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("WI", "West Indies", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("WIWN", "West Indies", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("West IndiesWN", "West Indies", raw.data.sub$toss_winner)
-raw.data.sub$toss_winner<- sub("ZIM", "Zimbabwe", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("AUS", "Australia", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("AUSWN", "Australia", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("AustraliaWN", "Australia", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("BD-W", "Bangladesh", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("BDESH", "Bangladesh", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("ENG", "England", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("ENGWN", "England", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("EnglandWN", "England", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("IND-W", "India", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("INDIA", "India", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("NZ", "New Zealand", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("NZWN", "New Zealand", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("New ZealandWN", "New Zealand", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("PAK", "Pakistan", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("PAK-W", "Pakistan", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("Pakistan-W", "Pakistan", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("SA", "South Africa", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("SA-W", "South Africa", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("South Africa-W", "South Africa", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("SL", "Sri Lanka", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("SL-W", "Sri Lanka", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("Sri Lanka-W", "Sri Lanka", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("WI", "West Indies", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("WIWN", "West Indies", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("West IndiesWN", "West Indies", raw.data.sub$toss_winner)
+raw.data.sub$toss_winner <-
+  sub("ZIM", "Zimbabwe", raw.data.sub$toss_winner)
 raw.data.sub$toss_winner <- as.factor(raw.data.sub$toss_winner)
 raw.data.sub <- droplevels(raw.data.sub)
 levels(raw.data.sub$toss_winner) # 10 unique countries, 1 empty level
@@ -244,32 +315,46 @@ sum(raw.data.sub$toss_winner == "") # 4 empty toss winners
 
 
 levels(raw.data.sub$winner)
-raw.data.sub$winner<- sub("AUS", "Australia", raw.data.sub$winner)
-raw.data.sub$winner<- sub("AUSWN", "Australia", raw.data.sub$winner)
-raw.data.sub$winner<- sub("AustraliaWN", "Australia", raw.data.sub$winner)
-raw.data.sub$winner<- sub("BD-W", "Bangladesh", raw.data.sub$winner)
-raw.data.sub$winner<- sub("BDESH", "Bangladesh", raw.data.sub$winner)
-raw.data.sub$winner<- sub("ENG", "England", raw.data.sub$winner)
-raw.data.sub$winner<- sub("ENGWN", "England", raw.data.sub$winner)
-raw.data.sub$winner<- sub("EnglandWN", "England", raw.data.sub$winner)
-raw.data.sub$winner<- sub("IND-W", "India", raw.data.sub$winner)
-raw.data.sub$winner<- sub("INDIA", "India", raw.data.sub$winner)
-raw.data.sub$winner<- sub("NZ", "New Zealand", raw.data.sub$winner)
-raw.data.sub$winner<- sub("NZWN", "New Zealand", raw.data.sub$winner)
-raw.data.sub$winner<- sub("New ZealandWN", "New Zealand", raw.data.sub$winner)
-raw.data.sub$winner<- sub("PAK", "Pakistan", raw.data.sub$winner)
-raw.data.sub$winner<- sub("PAK-W", "Pakistan", raw.data.sub$winner)
-raw.data.sub$winner<- sub("Pakistan-W", "Pakistan", raw.data.sub$winner)
-raw.data.sub$winner<- sub("SA", "South Africa", raw.data.sub$winner)
-raw.data.sub$winner<- sub("SA-W", "South Africa", raw.data.sub$winner)
-raw.data.sub$winner<- sub("South Africa-W", "South Africa", raw.data.sub$winner)
-raw.data.sub$winner<- sub("SL", "Sri Lanka", raw.data.sub$winner)
-raw.data.sub$winner<- sub("SL-W", "Sri Lanka", raw.data.sub$winner)
-raw.data.sub$winner<- sub("Sri Lanka-W", "Sri Lanka", raw.data.sub$winner)
-raw.data.sub$winner<- sub("WI", "West Indies", raw.data.sub$winner)
-raw.data.sub$winner<- sub("WIWN", "West Indies", raw.data.sub$winner)
-raw.data.sub$winner<- sub("West IndiesWN", "West Indies", raw.data.sub$winner)
-raw.data.sub$winner<- sub("ZIM", "Zimbabwe", raw.data.sub$winner)
+raw.data.sub$winner <- sub("AUS", "Australia", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("AUSWN", "Australia", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("AustraliaWN", "Australia", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("BD-W", "Bangladesh", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("BDESH", "Bangladesh", raw.data.sub$winner)
+raw.data.sub$winner <- sub("ENG", "England", raw.data.sub$winner)
+raw.data.sub$winner <- sub("ENGWN", "England", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("EnglandWN", "England", raw.data.sub$winner)
+raw.data.sub$winner <- sub("IND-W", "India", raw.data.sub$winner)
+raw.data.sub$winner <- sub("INDIA", "India", raw.data.sub$winner)
+raw.data.sub$winner <- sub("NZ", "New Zealand", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("NZWN", "New Zealand", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("New ZealandWN", "New Zealand", raw.data.sub$winner)
+raw.data.sub$winner <- sub("PAK", "Pakistan", raw.data.sub$winner)
+raw.data.sub$winner <- sub("PAK-W", "Pakistan", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("Pakistan-W", "Pakistan", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("SA", "South Africa", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("SA-W", "South Africa", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("South Africa-W", "South Africa", raw.data.sub$winner)
+raw.data.sub$winner <- sub("SL", "Sri Lanka", raw.data.sub$winner)
+raw.data.sub$winner <- sub("SL-W", "Sri Lanka", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("Sri Lanka-W", "Sri Lanka", raw.data.sub$winner)
+raw.data.sub$winner <- sub("WI", "West Indies", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("WIWN", "West Indies", raw.data.sub$winner)
+raw.data.sub$winner <-
+  sub("West IndiesWN", "West Indies", raw.data.sub$winner)
+raw.data.sub$winner <- sub("ZIM", "Zimbabwe", raw.data.sub$winner)
 raw.data.sub$winner <- as.factor(raw.data.sub$winner)
 raw.data.sub <- droplevels(raw.data.sub)
 levels(raw.data.sub$winner) # 10 unique countries, 1 empty level
@@ -292,28 +377,113 @@ set.series.significance <- function(seriescol, match, replace) {
 }
 
 ## set all the high importance series
-## World Cup, Champions Trophy, Women's Championship
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "World Cup", "high")
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "Champions Trophy", "high")
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "Women's Championship", "high")
+## World Cup, Champions Trophy, Women's Championship, ICC Women's Cricket Challenge, World Series of Women's Cricket
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "World Cup", "high")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Champions Trophy", "high")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Women's Championship", "high")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Women's Cricket Challenge", "high")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "World Series of Women's Cricket", "high")
 
 
 
 ## set all the medium importance series
-## wills trophy, Asia Cup, NatWest Series
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "Asia Cup", "medium")
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "NatWest Series", "medium")
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "Pakistan in India", "medium")
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "India in Pakistan", "medium")
+## wills trophy, Asia Cup, NatWest Series, Nehru Cup, Rose Bowl, Chappell-Hadlee Trophy, Mandela Trophy
+## Women's Ashes, Standard Bank International One-Day Series, Singer World Series
+## Total International Series, C.A.B. Jubilee Tournament (Hero Cup), Wills Trophy
+## ICC KnockOut, NatWest Challenge
+## Sharjah cup -> Coca-Cola Cup
+# Benson & Hedges -> VB Series, Carlton & United Series, Commonwealth Bank Series
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Asia Cup", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "NatWest Series", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Pakistan in India", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "India in Pakistan", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "England in Australia", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Australia in England", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Benson & Hedges", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "VB Series", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Carlton", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Nehru Cup", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Rose Bowl", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Commonwealth", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Chappell", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Mandela", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Women's Ashes", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Sharjah", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Coca-Cola Cup", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series,
+                          "Standard Bank International One-Day Series",
+                          "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Singer World Series", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Total International Series", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Hero Cup", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Wills Trophy", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "ICC KnockOut", "medium")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "NatWest Challenge", "medium")
 
 
 
 ## set all the low importance series
-## Bangladesh in, in Bangladesh, 
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "Bangladesh in", "low")
-raw.data.sub$series <- set.series.significance(raw.data.sub$series, "in Bangladesh", "low")
+## Bangladesh in, in Bangladesh, Prudential Trophy, Texaco Trophy, Friendship
+# # all othe ODI Series, all the Tri/Quadr[angular]
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Bangladesh in", "low")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "in Bangladesh", "low")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "ODI Series", "low")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Match", "low")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Texaco Trophy", "low")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Prudential Trophy", "low")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "angular", "low")
+raw.data.sub$series <-
+  set.series.significance(raw.data.sub$series, "Friendship", "low")
 
 
+# Set all other series to low importance
+set.all.low <- function(seriescol, replace) {
+  for (i in 1:length(seriescol)) {
+    if (!grepl("high", seriescol[i])
+        & !grepl("medium", seriescol[i])
+        & !grepl("low", seriescol[i]))
+      seriescol[i] <- replace
+  }
+  seriescol
+}
+
+raw.data.sub$series <- set.all.low(raw.data.sub$series, "low")
 
 
 
@@ -323,6 +493,11 @@ levels(raw.data.sub$series)
 summary(raw.data.sub$series)
 
 
+# set level order low < medium < high
+raw.data.sub$series <-
+  factor(raw.data.sub$series, c("low", "medium", "high"))
+levels(raw.data.sub$series)
+summary(raw.data.sub)
 
 
 
@@ -331,6 +506,21 @@ summary(raw.data.sub$series)
 
 
 
+# arrange variables
+library(dplyr)
+raw.data.sub <-
+  raw.data.sub %>% select(
+    team_a,
+    team_b,
+    gender,
+    series:date,
+    toss_winner:first_innings_total,
+    day_night,
+    rain:winner
+  )
 
 
-
+# write to transformed folder
+write.csv(x = raw.data.sub,
+          file = "3-transformed-data/cric_transformed_odi.csv",
+          row.names = FALSE)
