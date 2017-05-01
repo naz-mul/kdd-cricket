@@ -3,7 +3,8 @@ dm.required.packages <-
   c("lubridate",
     "dplyr",
     "ggplot2",
-    "scales")
+    "scales",
+    "rpart", "rpart.plot", "party")
 
 package.install.func <- function(x) {
   for (i in x) {
@@ -287,13 +288,99 @@ mean(awaywin$percent[awaywin$team_a == "Zimbabwe"]) # NaN
 
 
 # 300 or more runs, more wins
-score300 <-
-  with(cricket[cricket$first_innings_total >= 300, ], xtabs(~ first_innings_total, winner))
-# score300 / rowSums(score300) #
-# score300
+library(dplyr)
+fil_bat_decision <- filter(.data = cricket, first_innings_total >= 300) # 227 matches w/ 300+ runs
+fil_bat_decision <- select(.data = fil_bat_decision, team_a, team_b, toss_winner:first_innings_total, winner)
+
+
+bat_won <- nrow(fil_bat_decision[fil_bat_decision$toss_decision == "bat" 
+                                 & fil_bat_decision$toss_winner == fil_bat_decision$winner ,]) # 108
+
+field_won <- nrow(fil_bat_decision[fil_bat_decision$toss_decision == "field" 
+                                   & fil_bat_decision$toss_winner != fil_bat_decision$winner ,]) # 93
+
+
+(bat_won + field_won)/nrow(fil_bat_decision) # 88.54% won
 
 
 
+###### Data Mining - Decision Trees (rpart) #####
+library(dplyr)
+
+# convert logical value to numeric
+cricket$win_toss_win_game <- as.numeric(cricket$win_toss_win_game)
+
+# select data
+df <- select(.data = cricket, team_a:gender, series:team_a_venue,toss_winner:duckworth_lewis, win_toss_win_game)
+df <- arrange(.data = df, team_a, first_innings_total)
+df$win_toss_win_game <- factor(df$win_toss_win_game, levels = c(0, 1), labels = c("lost", "won"))
+
+# verify
+levels(df$win_toss_win_game)
+sapply(df$win_toss_win_game, class)
+str(df)
+
+# write to csv file
+write.csv(x = df,
+          file = "4-data-mining/win_toss_win_game.csv",
+          row.names = FALSE)
+
+# extract training data
+set.seed(1234)
+train <- sample(nrow(df), 0.7 * nrow(df))
+df.train <- df[train, ]
 
 
-###### Data Mining - Association Rules (apriori) #####
+# extract validation data
+df.validate <- df[-train, ]
+
+
+# Inspect
+# Categorical variables are examined using table()
+table(df.train$win_toss_win_game)
+table(df.validate$win_toss_win_game)
+
+
+# apply decision tree technique
+library(rpart)
+set.seed(1234)
+
+dtree <-
+  rpart(
+    win_toss_win_game ~ .,
+    data = df.train,
+    method = "class",
+    parms = list(split = "information")
+  )
+dtree
+
+summary(dtree)
+
+# Examine cp table to choose a final tree size
+# CP table contains prediction error for various tree sizes
+# CP is used to penalise larger trees
+# nsplit = number of branch splits i.e. n + 1 terminal nodes
+# rel error = error rate
+# xerror = cross-validated error based on 10-fold cross validation
+# xstd = standard error of the cross validation
+dtree$cptable
+
+# Plot complexity paramenter (CP) 
+plotcp(dtree)
+
+
+library(rpart.plot)
+prp(
+  dtree,
+  type = 2,
+  extra = 104,
+  fallen.leaves = T,
+  main = "Decision Tree"
+)
+
+library(party)
+fit.ctree <- ctree(win_toss_win_game ~ ., data = df.train)
+plot(fit.ctree, main = "Conditional Inference Tree")
+ctree.pred <- predict(fit.ctree, df.validate, type = "response")
+ctree.perf <- table(df.validate$win_toss_win_game, ctree.pred, dnn = c("Actual", "Predicted"))
+ctree.perf
