@@ -4,7 +4,8 @@ dm.required.packages <-
     "dplyr",
     "ggplot2",
     "scales",
-    "rpart", "rpart.plot", "party")
+    "rpart", "rpart.plot", "party", "RColorBrewer")
+
 
 package.install.func <- function(x) {
   for (i in x) {
@@ -18,6 +19,8 @@ package.install.func <- function(x) {
   }
 }
 
+
+install.packages("rattle", dependencies=c("Depends", "Suggests"))
 package.install.func(dm.required.packages)
 
 
@@ -330,10 +333,18 @@ set.seed(1234)
 train <- sample(nrow(df), 0.7 * nrow(df))
 df.train <- df[train, ]
 
+# write to csv file
+write.csv(x = df.train,
+          file = "4-data-mining/win_toss_win_game_train.csv",
+          row.names = FALSE)
 
 # extract validation data
 df.validate <- df[-train, ]
 
+# write to csv file
+write.csv(x = df.validate,
+          file = "4-data-mining/win_toss_win_game_validate.csv",
+          row.names = FALSE)
 
 # Inspect
 # Categorical variables are examined using table()
@@ -377,6 +388,19 @@ prp(
   fallen.leaves = T,
   main = "Decision Tree"
 )
+
+library(RGtk2)
+library(rattle)
+fancyRpartPlot(dtree)
+plot(dtree)
+
+# Classify each observation against validation sample data
+dtree.pred <- predict(dtree, df.validate, type = "class")
+
+# Create a cross tabulation of the actual status against the predicted status
+dtree.perf <- table(df.validate$win_toss_win_game, dtree.pred, dnn = c("Actual", "Predicted"))
+dtree.perf
+
 
 library(party)
 fit.ctree <- ctree(win_toss_win_game ~ ., data = df.train)
