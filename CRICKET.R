@@ -379,14 +379,24 @@ dtree$cptable
 plotcp(dtree)
 
 
+# Prune the tree
+# The tree is too large
+# Prune least important splits
+## smallest tree -> range between xerror + xstd and xerror - xstd 
+dtree.pruned <- prune(dtree, cp = 0.019)
+plotcp(dtree.pruned)
+
+
+
 library(rpart.plot)
 prp(
-  dtree,
+  dtree.pruned,
   type = 2,
   extra = 104,
   fallen.leaves = T,
   main = "Decision Tree"
 )
+
 
 # library(RGtk2)
 # library(rattle)
