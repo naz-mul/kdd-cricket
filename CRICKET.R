@@ -20,7 +20,6 @@ package.install.func <- function(x) {
 }
 
 
-install.packages("rattle", dependencies=c("Depends", "Suggests"))
 package.install.func(dm.required.packages)
 
 
@@ -389,10 +388,10 @@ prp(
   main = "Decision Tree"
 )
 
-library(RGtk2)
-library(rattle)
-fancyRpartPlot(dtree)
-plot(dtree)
+# library(RGtk2)
+# library(rattle)
+# fancyRpartPlot(dtree)
+
 
 # Classify each observation against validation sample data
 dtree.pred <- predict(dtree, df.validate, type = "class")
@@ -408,3 +407,5 @@ plot(fit.ctree, main = "Conditional Inference Tree")
 ctree.pred <- predict(fit.ctree, df.validate, type = "response")
 ctree.perf <- table(df.validate$win_toss_win_game, ctree.pred, dnn = c("Actual", "Predicted"))
 ctree.perf
+
+
